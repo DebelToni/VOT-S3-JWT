@@ -1,4 +1,3 @@
-
 # File Management Site VOT project
 
 ### Example of getting a token:
@@ -34,4 +33,20 @@ curl -X GET \
   "http://localhost:3000/download/test.txt" \
   -H "Authorization: Bearer <access_token>" \
   --output downloaded.txt
+```
+
+### Example of updating a file:
+```
+curl -X PUT \
+  "http://localhost:3000/update/test.txt" \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "SGVsbG8sIFVwZGF0ZWQgV29ybGQh"}'
+```
+
+### Example of deleting a file:
+```
+curl -X DELETE \
+  "http://localhost:3000/delete/test.txt" \
+  -H "Authorization: Bearer <access_token>"
 ```
