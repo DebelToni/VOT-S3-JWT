@@ -27,7 +27,7 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_HTTP_RESPONSE_HEADERS_ALLOW_ORIGIN=*
     # command: ["start-dev", "--import-realm"] 
-    command: ["start-dev"]
+    command: -start-dev --import-realm
     ports:
       - "8080:8080"
     healthcheck:
@@ -37,6 +37,7 @@ services:
       retries: 5
     volumes:
       - keycloak-data:/opt/keycloak/data
+      - ./config/myrealm-export.json:/opt/keycloak/data/import/myrealm-export.json
 
   app:
     build: ./app
