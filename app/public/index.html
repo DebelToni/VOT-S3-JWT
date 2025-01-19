@@ -1,132 +1,116 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+
 <head>
-  <meta charset="utf-8"/>
-  <title>File Management with Preview</title>
-  <!-- Link to our stylesheet -->
-  <link rel="stylesheet" href="style.css" />
+	<meta charset="utf-8" />
+	<title>File Management with Preview</title>
+	<!-- Link to our stylesheet -->
+	<link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <div class="container">
-    <h1>File Management (MinIO + Keycloak)</h1>
-    
-    <!-- Login Section -->
-    <div id="login-section" class="section">
-      <h2>Login</h2>
-      <div>
-        <label for="username">Username:</label>
-        <input type="text" id="username" placeholder="gosho" />
-      </div>
-      <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" placeholder="123" />
-      </div>
-      <button id="login-btn">Login</button>
-      <p id="login-msg" style="color: red;"></p>
-    </div>
+	<div class="container">
+		<h1>File Management (MinIO + Keycloak)</h1>
 
-    <!-- File Management Section -->
-    <div id="file-section" class="section hidden">
-      <h2>Welcome! Manage your files below.</h2>
-      
-      <!-- List Files -->
-      <button id="list-btn">List Files</button>
-      <div id="file-list-container">
-        <ul id="file-list"></ul>
-      </div>
+		<div id="login-section" class="section">
+			<h2>Login</h2>
+			<div>
+				<label for="username">Username:</label>
+				<input type="text" id="username" placeholder="gosho" />
+			</div>
+			<div>
+				<label for="password">Password:</label>
+				<input type="password" id="password" placeholder="123" />
+			</div>
+			<button id="login-btn">Login</button>
+			<p id="login-msg" style="color: red"></p>
+		</div>
 
-      <!-- Upload File (text or image) -->
-      <h3>Upload File</h3>
-      <label for="upload-filename">File Name:</label>
-      <input type="text" id="upload-filename" placeholder="example.txt or image.png"/>
+		<div id="file-section" class="section hidden">
+			<h2>Welcome! Manage your files below.</h2>
 
-      <div>
-        <label for="upload-file">Choose File (optional):</label>
-        <input type="file" id="upload-file" />
-      </div>
-      
-      <div>
-        <label for="upload-file-content">Or Paste Content:</label><br/>
-        <textarea id="upload-file-content" placeholder="File content here..." rows="3" cols="50"></textarea>
-      </div>
-      <button id="upload-btn">Upload</button>
+			<button id="list-btn">List Files</button>
+			<div id="file-list-container">
+				<ul id="file-list"></ul>
+			</div>
 
-      <!-- Download File -->
-      <h3>Download File</h3>
-      <label for="download-filename">File Name:</label>
-      <input type="text" id="download-filename" placeholder="filename.txt"/>
-      <button id="download-btn">Download</button>
+			<h3>Upload File</h3>
+			<label for="upload-filename">File Name:</label>
+			<input type="text" id="upload-filename" placeholder="example.txt or image.png" />
 
-      <!-- Update File -->
-      <h3>Update File</h3>
-      <label for="update-filename">File Name:</label>
-      <input type="text" id="update-filename" placeholder="filename.txt"/>
-      <label for="update-file-content">New Content:</label><br/>
-      <textarea id="update-file-content" placeholder="New file content" rows="3" cols="50"></textarea>
-      <button id="update-btn">Update</button>
+			<div>
+				<label for="upload-file">Choose File (optional):</label>
+				<input type="file" id="upload-file" />
+			</div>
 
-      <!-- Delete File -->
-      <h3>Delete File</h3>
-      <label for="delete-filename">File Name:</label>
-      <input type="text" id="delete-filename" placeholder="filename.txt"/>
-      <button id="delete-btn">Delete</button>
+			<div>
+				<label for="upload-file-content">Or Paste Content:</label><br />
+				<textarea id="upload-file-content" placeholder="File content here..." rows="3"
+					cols="50"></textarea>
+			</div>
+			<button id="upload-btn">Upload</button>
 
-      <p id="operation-msg" style="color: green; margin-top: 10px;"></p>
+			<h3>Download File</h3>
+			<label for="download-filename">File Name:</label>
+			<input type="text" id="download-filename" placeholder="filename.txt" />
+			<button id="download-btn">Download</button>
 
-      <!-- Preview Section -->
-      <h3>Preview</h3>
-      <div class="preview-area" id="preview-area">
-        <em>File preview will appear here</em>
-      </div>
-    </div>
-  </div>
+			<h3>Update File</h3>
+			<label for="update-filename">File Name:</label>
+			<input type="text" id="update-filename" placeholder="filename.txt" />
+			<label for="update-file-content">New Content:</label><br />
+			<textarea id="update-file-content" placeholder="New file content" rows="3" cols="50"></textarea>
+			<button id="update-btn">Update</button>
 
+			<h3>Delete File</h3>
+			<label for="delete-filename">File Name:</label>
+			<input type="text" id="delete-filename" placeholder="filename.txt" />
+			<button id="delete-btn">Delete</button>
+
+			<p id="operation-msg" style="color: green; margin-top: 10px"></p>
+
+			<h3>Preview</h3>
+			<div class="preview-area" id="preview-area">
+				<em>File preview will appear here</em>
+			</div>
+		</div>
+	</div>
+	<!--
   <script>
-    // Keycloak config
     const KEYCLOAK_URL = "http://localhost:8080";
     const REALM = "file-sharing-site";
     const CLIENT_ID = "file-management-client";
 
     let accessToken = null;
 
-    // DOM elements
     const loginSection = document.getElementById("login-section");
     const fileSection = document.getElementById("file-section");
     const loginMsg = document.getElementById("login-msg");
     const operationMsg = document.getElementById("operation-msg");
     const previewArea = document.getElementById("preview-area");
 
-    // Login elements
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
     const loginBtn = document.getElementById("login-btn");
 
-    // File list elements
     const listBtn = document.getElementById("list-btn");
     const fileList = document.getElementById("file-list");
 
-    // Upload elements
     const uploadBtn = document.getElementById("upload-btn");
     const uploadFilename = document.getElementById("upload-filename");
     const uploadFileInput = document.getElementById("upload-file");
     const uploadFileContent = document.getElementById("upload-file-content");
 
-    // Download elements
     const downloadBtn = document.getElementById("download-btn");
     const downloadFilename = document.getElementById("download-filename");
 
-    // Update elements
     const updateBtn = document.getElementById("update-btn");
     const updateFilename = document.getElementById("update-filename");
     const updateFileContent = document.getElementById("update-file-content");
 
-    // Delete elements
     const deleteBtn = document.getElementById("delete-btn");
     const deleteFilename = document.getElementById("delete-filename");
 
-    // ------------------------------------------
-    // LOGIN - Resource Owner Password Flow
-    // ------------------------------------------
     loginBtn.addEventListener("click", async () => {
       const username = usernameInput.value.trim();
       const password = passwordInput.value.trim();
@@ -144,8 +128,7 @@
         const params = new URLSearchParams();
         params.append("grant_type", "password");
         params.append("client_id", CLIENT_ID);
-        // If your client is confidential, you'd also do:
-        // params.append("client_secret", "...secret...");
+
         params.append("username", username);
         params.append("password", password);
 
@@ -166,7 +149,7 @@
         const data = await response.json();
         accessToken = data.access_token;
         loginMsg.innerText = "Login successful!";
-        
+
         loginSection.classList.add("hidden");
         fileSection.classList.remove("hidden");
       } catch (err) {
@@ -175,9 +158,6 @@
       }
     });
 
-    // ------------------------------------------
-    // AUTH HEADERS
-    // ------------------------------------------
     function getAuthHeaders() {
       return {
         "Content-Type": "application/json",
@@ -185,9 +165,6 @@
       };
     }
 
-    // ------------------------------------------
-    // LIST FILES
-    // ------------------------------------------
     listBtn.addEventListener("click", async () => {
       operationMsg.innerText = "";
       fileList.innerHTML = "";
@@ -203,7 +180,7 @@
           return;
         }
         const data = await resp.json();
-        // data.files is an array of filenames
+
         data.files.forEach(fileName => {
           const li = document.createElement("li");
           li.className = "file-item";
@@ -211,7 +188,6 @@
           const span = document.createElement("span");
           span.textContent = fileName;
 
-          // PREVIEW button
           const previewButton = document.createElement("button");
           previewButton.textContent = "Preview";
           previewButton.addEventListener("click", () => {
@@ -228,12 +204,9 @@
       }
     });
 
-    // ------------------------------------------
-    // PREVIEW FILE (Text or Image)
-    // ------------------------------------------
     async function previewFile(fileName) {
       try {
-        // We'll fetch the file as a blob
+
         const resp = await fetch(`/download/${encodeURIComponent(fileName)}`, {
           headers: {
             "Authorization": "Bearer " + accessToken
@@ -245,10 +218,9 @@
         }
         const blob = await resp.blob();
 
-        // Let's do a quick extension check
         const fileExtension = fileName.split(".").pop().toLowerCase();
         if (["png", "jpg", "jpeg", "gif"].includes(fileExtension)) {
-          // It's an image -> show an <img>
+
           const url = URL.createObjectURL(blob);
           previewArea.innerHTML = "";
           const img = document.createElement("img");
@@ -256,7 +228,7 @@
           img.src = url;
           previewArea.appendChild(img);
         } else {
-          // Try to read it as text
+
           const text = await blob.text();
           previewArea.textContent = text;
         }
@@ -266,9 +238,6 @@
       }
     }
 
-    // ------------------------------------------
-    // UPLOAD FILE (Text or Image)
-    // ------------------------------------------
     uploadBtn.addEventListener("click", async () => {
       const fileName = uploadFilename.value.trim();
       if (!fileName) {
@@ -279,17 +248,16 @@
       operationMsg.innerText = "Uploading...";
 
       try {
-        // Priority: If user selected a file in <input type="file">, use that
-        // Otherwise, use the text from the textarea
+
         let fileDataBase64 = "";
 
         if (uploadFileInput.files && uploadFileInput.files.length > 0) {
-          // We have a file from the file input
+
           fileDataBase64 = await convertFileToBase64(uploadFileInput.files[0]);
         } else {
-          // No file selected, use the textarea content
+
           const textContent = uploadFileContent.value;
-          fileDataBase64 = btoa(textContent); // encode to base64
+          fileDataBase64 = btoa(textContent); 
         }
 
         const resp = await fetch(`/upload?name=${encodeURIComponent(fileName)}`, {
@@ -309,7 +277,6 @@
       }
     });
 
-    // Helper function to read file as base64
     function convertFileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -322,9 +289,6 @@
       });
     }
 
-    // ------------------------------------------
-    // DOWNLOAD FILE
-    // ------------------------------------------
     downloadBtn.addEventListener("click", async () => {
       const fileName = downloadFilename.value.trim();
       if (!fileName) {
@@ -363,9 +327,6 @@
       }
     });
 
-    // ------------------------------------------
-    // UPDATE FILE
-    // ------------------------------------------
     updateBtn.addEventListener("click", async () => {
       const fileName = updateFilename.value.trim();
       const newContent = updateFileContent.value;
@@ -393,9 +354,6 @@
       }
     });
 
-    // ------------------------------------------
-    // DELETE FILE
-    // ------------------------------------------
     deleteBtn.addEventListener("click", async () => {
       const fileName = deleteFilename.value.trim();
       if (!fileName) {
@@ -419,7 +377,8 @@
         operationMsg.innerText = "Error deleting file.";
       }
     });
-  </script>
+</script>-->
+	<script src="main.js"></script>
 </body>
-</html>
 
+</html>

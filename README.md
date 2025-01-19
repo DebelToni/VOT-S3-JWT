@@ -9,6 +9,8 @@ This project / homework is setup up using:
 - **Keycloak** for authentication
 - **Minio S3** for file storage
 
+<br>
+
 ### Example of getting a token:
 ```
 curl -X POST \

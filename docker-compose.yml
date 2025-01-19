@@ -27,7 +27,8 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_HTTP_RESPONSE_HEADERS_ALLOW_ORIGIN=*
     # command: ["start-dev", "--import-realm"] 
-    command: -start-dev --import-realm
+    # command: -start-dev --import-realm
+    command: ["start-dev"]
     ports:
       - "8080:8080"
     healthcheck:
