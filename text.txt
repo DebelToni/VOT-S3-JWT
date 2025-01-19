@@ -1,0 +1,7 @@
+curl -X POST 'http://localhost:8080/realms/file-sharing-site/protocol/openid-connect/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-d 'grant_type=password' \
+-d 'client_id=file-management-client' \
+-d 'client_secret=wSDt1DCOPqtDHmLW8PxvYcbGWJhnPYZw' \
+-d 'username=gosho' \
+-d 'password=123'

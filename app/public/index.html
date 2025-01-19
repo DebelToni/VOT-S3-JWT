@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>File Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #login-section, #file-section {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>File Management (MinIO + Keycloak)</h1>
+  <div id="login-section">
+    <h2>Login</h2>
+    <div>
+      <label for="username">Username:</label>
+      <input type="text" id="username" placeholder="gosho"/>
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" placeholder="123"/>
+    </div>
+    <button id="login-btn">Login</button>
+    <p id="login-msg"></p>
+  </div>
+
+  <div id="file-section" class="hidden">
+    <h2>Welcome! Manage your files below.</h2>
+    <div>
+      <button id="list-btn">List Files</button>
+      <ul id="file-list"></ul>
+    </div>
+
+    <div>
+      <h3>Upload File</h3>
+      <input type="text" id="upload-filename" placeholder="filename.txt"/>
+      <textarea id="upload-file-content" placeholder="File content here..." rows="3" cols="50"></textarea>
+      <button id="upload-btn">Upload</button>
+    </div>
+
+    <div>
+      <h3>Download File</h3>
+      <input type="text" id="download-filename" placeholder="filename.txt"/>
+      <button id="download-btn">Download</button>
+    </div>
+
+    <div>
+      <h3>Update File</h3>
+      <input type="text" id="update-filename" placeholder="filename.txt"/>
+      <textarea id="update-file-content" placeholder="New file content" rows="3" cols="50"></textarea>
+      <button id="update-btn">Update</button>
+    </div>
+
+    <div>
+      <h3>Delete File</h3>
+      <input type="text" id="delete-filename" placeholder="filename.txt"/>
+      <button id="delete-btn">Delete</button>
+    </div>
+
+    <p id="operation-msg"></p>
+  </div>
+
+  <script>
+    const KEYCLOAK_URL = "http://localhost:8080";
+    const REALM = "file-sharing-site";
+    const CLIENT_ID = "file-management-client";
+
+    let accessToken = null;
+
+    const loginSection = document.getElementById("login-section");
+    const fileSection = document.getElementById("file-section");
+    const loginMsg = document.getElementById("login-msg");
+    const operationMsg = document.getElementById("operation-msg");
+
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const loginBtn = document.getElementById("login-btn");
+
+    const listBtn = document.getElementById("list-btn");
+    const fileList = document.getElementById("file-list");
+    const uploadBtn = document.getElementById("upload-btn");
+    const uploadFilename = document.getElementById("upload-filename");
+    const uploadFileContent = document.getElementById("upload-file-content");
+    const downloadBtn = document.getElementById("download-btn");
+    const downloadFilename = document.getElementById("download-filename");
+    const updateBtn = document.getElementById("update-btn");
+    const updateFilename = document.getElementById("update-filename");
+    const updateFileContent = document.getElementById("update-file-content");
+    const deleteBtn = document.getElementById("delete-btn");
+    const deleteFilename = document.getElementById("delete-filename");
+
+    loginBtn.addEventListener("click", async () => {
+      const username = usernameInput.value;
+      const password = passwordInput.value;
+
+      if (!username || !password) {
+        loginMsg.innerText = "Please enter username and password.";
+        return;
+      }
+
+      loginMsg.innerText = "Logging in...";
+
+      try {
+        const tokenUrl = `${KEYCLOAK_URL}/realms/${REALM}/protocol/openid-connect/token`;
+
+        const params = new URLSearchParams();
+        params.append("grant_type", "password");
+        params.append("client_id", CLIENT_ID);
+        params.append("username", username);
+        params.append("password", password);
+
+        const response = await fetch(tokenUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: params.toString(),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          loginMsg.innerText = "Login failed: " + (errorData.error_description || "Unknown error");
+          return;
+        }
+
+        const data = await response.json();
+        accessToken = data.access_token;
+        loginMsg.innerText = "Login successful!";
+        
+        loginSection.classList.add("hidden");
+        fileSection.classList.remove("hidden");
+      } catch (err) {
+        console.error(err);
+        loginMsg.innerText = "Error during login.";
+      }
+    });
+
+    function getAuthHeaders() {
+      return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + accessToken
+      };
+    }
+
+    listBtn.addEventListener("click", async () => {
+      operationMsg.innerText = "";
+      fileList.innerHTML = "";
+
+      try {
+        const resp = await fetch("/files", {
+          method: "GET",
+          headers: getAuthHeaders()
+        });
+        if (!resp.ok) {
+          operationMsg.innerText = "Error listing files.";
+          return;
+        }
+        const data = await resp.json();
+        data.files.forEach(fileName => {
+          const li = document.createElement("li");
+          li.textContent = fileName;
+          fileList.appendChild(li);
+        });
+      } catch (err) {
+        console.error(err);
+        operationMsg.innerText = "Error listing files.";
+      }
+    });
+
+    uploadBtn.addEventListener("click", async () => {
+      const fileName = uploadFilename.value;
+      const fileContent = uploadFileContent.value;
+      if (!fileName || !fileContent) {
+        operationMsg.innerText = "Provide filename and file content.";
+        return;
+      }
+
+      operationMsg.innerText = "Uploading...";
+
+      try {
+        const base64Data = btoa(fileContent);
+
+        const resp = await fetch(`/upload?name=${encodeURIComponent(fileName)}`, {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ file: base64Data })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          operationMsg.innerText = "Upload failed: " + data.error;
+          return;
+        }
+        operationMsg.innerText = data.message;
+      } catch (err) {
+        console.error(err);
+        operationMsg.innerText = "Error uploading file.";
+      }
+    });
+
+    downloadBtn.addEventListener("click", async () => {
+      const fileName = downloadFilename.value;
+      if (!fileName) {
+        operationMsg.innerText = "Specify file name to download.";
+        return;
+      }
+
+      operationMsg.innerText = "Downloading...";
+
+      try {
+        const resp = await fetch(`/download/${encodeURIComponent(fileName)}`, {
+          method: "GET",
+          headers: {
+            "Authorization": "Bearer " + accessToken
+          }
+        });
+
+        if (!resp.ok) {
+          operationMsg.innerText = "File download failed.";
+          return;
+        }
+
+        const blob = await resp.blob();
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        
+        URL.revokeObjectURL(url);
+        operationMsg.innerText = `File '${fileName}' downloaded.`;
+      } catch (err) {
+        console.error(err);
+        operationMsg.innerText = "Error downloading file.";
+      }
+    });
+
+    updateBtn.addEventListener("click", async () => {
+      const fileName = updateFilename.value;
+      const newContent = updateFileContent.value;
+      if (!fileName || !newContent) {
+        operationMsg.innerText = "Specify file name and new content.";
+        return;
+      }
+
+      try {
+        const base64Data = btoa(newContent);
+        const resp = await fetch(`/update/${encodeURIComponent(fileName)}`, {
+          method: "PUT",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ file: base64Data })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          operationMsg.innerText = "Update failed: " + data.error;
+          return;
+        }
+        operationMsg.innerText = data.message;
+      } catch (err) {
+        console.error(err);
+        operationMsg.innerText = "Error updating file.";
+      }
+    });
+
+    deleteBtn.addEventListener("click", async () => {
+      const fileName = deleteFilename.value;
+      if (!fileName) {
+        operationMsg.innerText = "Specify file name to delete.";
+        return;
+      }
+
+      try {
+        const resp = await fetch(`/delete/${encodeURIComponent(fileName)}`, {
+          method: "DELETE",
+          headers: getAuthHeaders()
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          operationMsg.innerText = "Delete failed: " + data.error;
+          return;
+        }
+        operationMsg.innerText = data.message;
+      } catch (err) {
+        console.error(err);
+        operationMsg.innerText = "Error deleting file.";
+      }
+    });
+  </script>
+</body>
+</html>
+
