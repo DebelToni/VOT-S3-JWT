@@ -1,7 +1,7 @@
 
-#h File Management Site VOT project
+# File Management Site VOT project
 
-#h2 Example of getting a token:
+### Example of getting a token:
 ```
 curl -X POST \
   http://localhost:8080/realms/file-sharing-site/protocol/openid-connect/token \
@@ -12,7 +12,7 @@ curl -X POST \
   -d "password=123"
 ```
 
-#h2 Example of uploading file after getting a token:
+### Example of uploading file after getting a token:
 ```
 curl -X POST \
   "http://localhost:3000/upload?name=test.txt" \
@@ -21,9 +21,17 @@ curl -X POST \
   -d '{"file": "SGVsbG8sIFdvcmxkIQ=="}'
 ```
 
-#h2 Example of downloading file after getting a token:
+### Example of downloading file after getting a token:
 ```
 curl -X GET \
   "http://localhost:3000/files" \
   -H "Authorization: Bearer <access_token>"
+```
+
+### Example of dowloading a file:
+```
+curl -X GET \
+  "http://localhost:3000/download/test.txt" \
+  -H "Authorization: Bearer <access_token>" \
+  --output downloaded.txt
 ```
