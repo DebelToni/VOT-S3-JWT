@@ -1,5 +1,14 @@
 # File Management Site VOT project
 
+## Anton Hristov №4 11b
+
+This project / homework is setup up using:
+- **Node.js** server
+- **Express.js** for the backend
+- **Docker** for running the services
+- **Keycloak** for authentication
+- **Minio S3** for file storage
+
 ### Example of getting a token:
 ```
 curl -X POST \
